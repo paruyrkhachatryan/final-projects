@@ -7,10 +7,10 @@ This module implements a simple memory game where the player flips cards to find
 import random
 import pygame
 
-# Initialize Pygame
+
 pygame.init()
 
-# Constants
+# Consts
 SCREEN_WIDTH = 1000
 SCREEN_HEIGHT = 800
 WHITE = (255, 255, 255)
@@ -19,7 +19,7 @@ GRID_SIZE = (4, 4)
 CARD_SIZE = (100, 100)
 MARGIN = 10
 
-# Set up the display
+#  Display set up
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Memory Game')
 clock = pygame.time.Clock()
@@ -88,7 +88,7 @@ def main():
     running = True
 
     while running:
-        running = handle_events(cards, flipped_cards, running)
+        running = hand_events(cards, flipped_cards, running)
         screen.fill(WHITE)
         for card in cards:
             card.draw(screen)
@@ -98,16 +98,16 @@ def main():
 
     pygame.quit()
 
-def handle_events(cards, flipped_cards, running):
+def hand_events(cards, flipped_cards, running):
     """Handle events in the game loop."""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             return False  
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            handle_mouse_button_down_event(event, cards, flipped_cards)
+            hand_mouse_event(event, cards, flipped_cards)
     return running
 
-def handle_mouse_button_down_event(event, cards, flipped_cards):
+def hand_mouse_event(event, cards, flipped_cards):
     """Handle mouse button down events."""
     mouse_pos = pygame.mouse.get_pos()
     for card in cards:
