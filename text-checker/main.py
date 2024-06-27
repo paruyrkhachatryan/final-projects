@@ -1,43 +1,55 @@
+"""Spell Checker using TextBlob.
+
+This module provides a command-line utility to check and correct spelling in a text file.
+It uses TextBlob library to identify and suggest corrections for misspelled words.
+"""
+
 import argparse
 from textblob import TextBlob
 
-def check_spelling(input_file, output_file):
+def check_spelling(input_file_path, output_file_path):
+    """Check and correct spelling in the given text file.
+
+    Args:
+        input_file_path (str): The path to the input file.
+        output_file_path (str): The path to the output file where corrected text will be saved.
+    """
     try:
-        with open(input_file, 'r') as file:
+        with open(input_file_path, 'r', encoding='utf-8') as file:
             text = file.read()
-    except FileNotFoundError:
-        print(f"Error: The file {input_file} does not exist.")
-        return
-    except IOError:
-        print(f"Error: Could not read the file {input_file}.")
+    except (FileNotFoundError, IOError) as error:
+        print(f"Error: {error}")
         return
 
     blob = TextBlob(text)
-    corrected_text = ""
+    corrected_text = []
     
     for word in blob.words:
         corrected_word = word.correct()
         if corrected_word != word:
             print(f"Original: {word} -> Suggested: {corrected_word}")
-            choice = input("Choose (s)uggested or (o)riginal: ")
-            if choice.lower() == 's':
-                corrected_text += str(corrected_word) + " "
-            else:
-                corrected_text += str(word) + " "
+            choice = input("Choose (s)uggested or (o)riginal: ").lower()
+            corrected_text.append(corrected_word if choice == 's' else word)
         else:
-            corrected_text += str(word) + " "
+            corrected_text.append(word)
+    
+    corrected_text_str = ' '.join(corrected_text)
     
     try:
-        with open(output_file, 'w') as file:
-            file.write(corrected_text)
-        print(f"Corrected text saved to {output_file}")
-    except IOError:
-        print(f"Error: Could not write to the file {output_file}.")
+        with open(output_file_path, 'w', encoding='utf-8') as file:
+            file.write(corrected_text_str)
+        print(f"Corrected text saved to {output_file_path}")
+    except IOError as error:
+        print(f"Error: {error}")
 
-if __name__ == "__main__":
+def main():
+    """Main function that parses arguments and calls the spell checker."""
     parser = argparse.ArgumentParser(description='Check and correct spelling in a text file.')
     parser.add_argument('-f', '--file', required=True, help='Input file containing text to check')
     parser.add_argument('-o', '--output', required=True, help='Output file to save the corrected text')
 
     args = parser.parse_args()
     check_spelling(args.file, args.output)
+
+if __name__ == "__main__":
+    main()
