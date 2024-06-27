@@ -1,11 +1,23 @@
+import os
 import tkinter as tk
 from tkinter import filedialog, messagebox
-import os
+
 import pandas as pd
 import requests
 
+
 class CryptoApp:
+    """
+    A class used to create a GUI application for fetching cryptocurrency information.
+    """
+
     def __init__(self, root):
+        """
+        Initialize the application.
+
+        Args:
+            root (tk.Tk): The root window of the Tkinter application.
+        """
         self.root = root
         self.root.title("Crypto Info Generator")
         self.root.geometry("400x200")
@@ -27,18 +39,24 @@ class CryptoApp:
         self.symbols = []
 
     def upload_file(self):
+        """
+        Handle the upload of a file containing cryptocurrency symbols.
+        """
         self.filepath = filedialog.askopenfilename(filetypes=[("Text files", "*.txt")])
         if self.filepath:
             self.filename_label.config(text=os.path.basename(self.filepath))
-            with open(self.filepath, 'r') as file:
+            with open(self.filepath, 'r', encoding='utf-8') as file:
                 self.symbols = file.read().strip().split()
             messagebox.showinfo("File Uploaded", "Symbols loaded successfully")
 
     def save_file(self):
+        """
+        Handle the saving of the fetched cryptocurrency data to an Excel file.
+        """
         if not self.filepath:
             messagebox.showerror("Error", "Please upload a file first")
             return
-        
+
         output_dir = filedialog.askdirectory(initialdir=os.path.expanduser('~/Downloads'))
         if not output_dir:
             return
@@ -46,9 +64,9 @@ class CryptoApp:
         output_filename = self.name_entry.get()
         if not output_filename.endswith('.xlsx'):
             output_filename += '.xlsx'
-        
+
         output_path = os.path.join(output_dir, output_filename)
-        
+
         crypto_data = self.fetch_crypto_data(self.symbols)
         if crypto_data:
             df = pd.DataFrame(crypto_data)
@@ -57,7 +75,17 @@ class CryptoApp:
         else:
             messagebox.showerror("Error", "Failed to fetch cryptocurrency data")
 
-    def fetch_crypto_data(self, symbols):
+    @staticmethod
+    def fetch_crypto_data(symbols):
+        """
+        Fetch cryptocurrency data for the given symbols from the CoinGecko API.
+
+        Args:
+            symbols (list): A list of cryptocurrency symbols.
+
+        Returns:
+            list: A list of dictionaries containing cryptocurrency data, or None if the request fails.
+        """
         url = "https://api.coingecko.com/api/v3/coins/markets"
         params = {
             "vs_currency": "usd",
@@ -77,8 +105,8 @@ class CryptoApp:
                     "Price Change (24h)": item.get("price_change_percentage_24h")
                 })
             return crypto_data
-        else:
-            return None
+        return None
+
 
 if __name__ == "__main__":
     root = tk.Tk()
